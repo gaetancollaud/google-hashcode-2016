@@ -44,7 +44,7 @@ public class HashCode {
 					//assign operation
 					final Optional<Order> optOrder = getBestOrderForDrone(drone);
 					if (optOrder.isPresent()) {
-						executeOrderForDrone(turn, drone, optOrder.get());
+						executeOrderForDrone(game, turn, drone, optOrder.get());
 					}
 				}
 			}
@@ -56,36 +56,23 @@ public class HashCode {
 			return Optional.empty();
 		}
 		Collections.sort(game.getOrders(), Comparator.comparingInt(o -> o.getDestination().euclidianDistanceCeil(d.getCurrentPosition())));
+		//Collections.sort(game.getOrders(), Comparator.comparingInt(o -> commandsCost(o.makeCommandsForThisOrder(game, d, false))));
 		return Optional.of(game.getOrders().remove(0));
 	}
 
-	private void executeOrderForDrone(int turn, Drone drone, Order order) {
+	private int commandsCost(List<Command> list) {
 		int cost = 0;
-		for (Map.Entry<ItemType, Integer> item : order.getItemList().getAll().entrySet()) {
-			for (int i = 0; i < item.getValue(); i++) {
-				Warehouse w = closestWarehouse(drone, item.getKey());
-
-				Command commandLoad = Command.LoadCommand(drone, w, item.getKey(), 1);
-				cost += commandLoad.computeCost();
-				commands.add(commandLoad);
-				
-				
-				w.takeFromStock(item.getKey(), 1);
-
-				Command commandDeliver = Command.DeliverCommand(drone, order, item.getKey(), 1);
-				cost += commandDeliver.computeCost();
-				commands.add(commandDeliver);
-			}
+		for (Command command : list) {
+			cost += command.computeCost();
 		}
-		drone.setBusyUntilTurn(turn + cost);
+		return cost;
 	}
 
-	private Warehouse closestWarehouse(Drone d, ItemType t) {
-		return game.getWarehouses().stream()
-				.filter(w -> w.inStock(t))
-				.sorted(Comparator.comparingInt(w -> d.getCurrentPosition().euclidianDistanceCeil(w.getPosition())))
-				.findFirst()
-				.get();
+	private void executeOrderForDrone(Game game, int turn, Drone drone, Order order) {
+		List<Command> listC = order.makeCommandsForThisOrder(game, drone, true);
+		final int endTurn = turn + commandsCost(listC);
+		drone.setBusyUntilTurn(endTurn);
+		commands.addAll(listC);
 	}
 
 	private void readInput() {

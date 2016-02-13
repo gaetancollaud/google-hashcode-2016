@@ -27,6 +27,12 @@ public class Warehouse {
 	public void addStock(ItemType item, int amount) {
 		stock.add(item, amount);
 	}
+	
+	public void addStock(Stock<ItemType> stockToAdd){
+		for (Map.Entry<ItemType, Integer> i : stockToAdd.getAll().entrySet()) {
+			addStock(i.getKey(), i.getValue());
+		}
+	}
 
 	public int getStock(ItemType item) {
 		return stock.count(item);
