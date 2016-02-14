@@ -32,9 +32,13 @@ public class HashCode {
 	private List<Command> commands = new ArrayList<>();
 
 	public void solve() {
+		long start = System.currentTimeMillis();
 		readInput();
 		doSolve();
 		writeOutput();
+		long end = System.currentTimeMillis();
+
+		System.out.println("Solve " + inputFile + " took " + ((end - start) / 1000) + "secs");
 	}
 
 	private void doSolve() {
@@ -55,15 +59,26 @@ public class HashCode {
 		if (game.getOrders().isEmpty()) {
 			return Optional.empty();
 		}
-		Collections.sort(game.getOrders(), Comparator.comparingInt(o -> o.getDestination().euclidianDistanceCeil(d.getCurrentPosition())));
-		//Collections.sort(game.getOrders(), Comparator.comparingInt(o -> commandsCost(o.makeCommandsForThisOrder(game, d, false))));
+//		Collections.sort(game.getOrders(), Comparator.comparingInt(o -> o.getDestination().euclidianDistanceCeil(d.getCurrentPosition())));$
+		try {
+			Collections.sort(game.getOrders(), Comparator.comparingInt(o -> commandsCost(o.makeCommandsForThisOrder(game, d, false))));
+		} catch (Exception ex) {
+		}
 		return Optional.of(game.getOrders().remove(0));
 	}
 
 	private int commandsCost(List<Command> list) {
 		int cost = 0;
+		Command lastCommand = null;
 		for (Command command : list) {
 			cost += command.computeCost();
+			if (lastCommand != null) {
+				if (command.samePlace(lastCommand)) {
+					cost--;
+				}
+			}
+
+			lastCommand = command;
 		}
 		return cost;
 	}
@@ -143,6 +158,6 @@ public class HashCode {
 			command.print(sb);
 		}
 		ow.writeFile();
-		System.out.println(ow.getContent());
+		//System.out.println(ow.getContent());
 	}
 }

@@ -29,6 +29,17 @@ public class Command {
 		Point2DInt dest = warehouse == null ? order.getDestination() : warehouse.getPosition();
 		return drone.getCurrentPosition().euclidianDistanceCeil(dest)+1;
 	}
+	
+	public boolean samePlace(Command other){
+		if(other.type==type){
+			if(type=='D'){
+				return order.getId()==other.order.getId();
+			}else{
+				return warehouse.getId()==other.warehouse.getId();
+			}
+		}
+		return false;
+	}
 
 	public void print(StringBuilder sb) {
 		sb.append(drone.getId());

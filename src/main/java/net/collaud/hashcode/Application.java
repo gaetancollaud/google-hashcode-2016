@@ -17,7 +17,7 @@ public class Application {
 				"mother_of_all_warehouses",
 				"redundancy",
 				"busy_day");
-		files.stream().forEach(f -> {
+		files.parallelStream().forEach(f -> {
 			String in = "data/inputs/"+f+".in";
 			String out = "data/outputs/"+f+".out";
 			new HashCode(in, out).solve();
