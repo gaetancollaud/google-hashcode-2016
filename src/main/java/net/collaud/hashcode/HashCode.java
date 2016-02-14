@@ -28,8 +28,8 @@ public class HashCode {
 
 	private final String inputFile;
 	private final String outputFile;
-	private Game game = new Game();
-	private List<Command> commands = new ArrayList<>();
+	private final Game game = new Game();
+	private final List<Command> commands = new ArrayList<>();
 
 	public void solve() {
 		long start = System.currentTimeMillis();
@@ -38,7 +38,7 @@ public class HashCode {
 		writeOutput();
 		long end = System.currentTimeMillis();
 
-		System.out.println("Solve " + inputFile + " took " + ((end - start) / 1000) + "secs");
+		System.out.println("Solve " + inputFile + " took " + ((end - start) / 1000) + "s");
 	}
 
 	private void doSolve() {
